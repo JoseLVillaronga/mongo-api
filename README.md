@@ -202,6 +202,49 @@ Esta API puede ser utilizada en diversos escenarios, especialmente ahora que cue
 - **Integración con sistemas legacy**: Sistemas antiguos pueden acceder a datos en MongoDB sin necesidad de drivers específicos.
 - **Aplicaciones web de bajo código**: Interfaces JavaScript que interactúan directamente con esta API sin necesidad de backend.
 
+#### Ejemplo: Aplicación web de bajo código
+
+A continuación se muestra un ejemplo de cómo crear una aplicación web que interactúa directamente con la API desde JavaScript, sin necesidad de un backend tradicional:
+
+```javascript
+// Función para buscar documentos en MongoDB
+async function buscarProductos(filtro) {
+    const respuesta = await fetch('https://api.tudominio.com/api/documents/find', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer TU_API_KEY' // Solo si necesitas permisos elevados
+        },
+        body: JSON.stringify({
+            mongo_request: {
+                database: 'tienda',
+                collection: 'productos'
+            },
+            filter: filtro,
+            sort: [{ field: 'precio', order: 1 }],
+            limit: 20
+        })
+    });
+    return await respuesta.json();
+}
+
+// Usar con frameworks como React, Vue o Alpine.js
+document.getElementById('buscar').addEventListener('click', async () => {
+    const productos = await buscarProductos({ categoria: 'electrónica' });
+    
+    // Renderizar resultados
+    const resultadosDiv = document.getElementById('resultados');
+    resultadosDiv.innerHTML = productos.documents.map(p => 
+        `<div class="producto">
+            <h3>${p.nombre}</h3>
+            <p>${p.precio}€</p>
+        </div>`
+    ).join('');
+});
+```
+
+Este enfoque permite crear aplicaciones web completas usando solo HTML, CSS y JavaScript, donde la API de MongoDB Ultra-rápida realiza todo el trabajo de backend.
+
 ### Despliegue seguro con Caddy
 
 Para exponer esta API de forma segura a Internet, puedes utilizar Caddy como proxy inverso. A continuación, se muestra una configuración de ejemplo para el archivo `Caddyfile`:
