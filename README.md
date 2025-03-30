@@ -142,16 +142,20 @@ curl -X POST "http://localhost:28000/api/documents/find" \
   }'
 
 # Insertar un documento (con autenticación - rol admin)
-curl -X POST "http://localhost:28000/api/documents" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer 9791cd25-b7e1-4059-d26b-397dee7dd442" \
+curl -X 'POST' \
+  'http://localhost:28000/api/documents' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 9791cd25-b7e1-4059-d26b-397dee7dd442' \
+  -H 'Content-Type: application/json' \
   -d '{
-    "database": "test",
-    "collection": "usuarios",
-    "document": {
-      "nombre": "Juan",
-      "edad": 30,
-      "email": "juan@ejemplo.com"
-    }
-  }'
+  "request": {
+    "database": "shop",
+    "collection": "products"
+  },
+  "document": {
+    "name": "A Book",
+    "price": 15,
+    "Description": "Halo, Cience Fiction"
+  }
+}'
 ``` 
