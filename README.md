@@ -150,8 +150,10 @@ Si no se proporciona un token o es inválido, se asumirá el rol predeterminado 
 curl -X POST "http://localhost:28000/api/documents/find" \
   -H "Content-Type: application/json" \
   -d '{
-    "database": "test",
-    "collection": "usuarios",
+    "mongo_request": {
+      "database": "test",
+      "collection": "usuarios"
+    },
     "filter": {"edad": {"$gt": 25}},
     "sort": [{"field": "edad", "order": 1}],
     "limit": 10
@@ -164,7 +166,7 @@ curl -X 'POST' \
   -H 'Authorization: Bearer 9791cd25-b7e1-4059-d26b-397dee7dd442' \
   -H 'Content-Type: application/json' \
   -d '{
-  "request": {
+  "mongo_request": {
     "database": "shop",
     "collection": "products"
   },
