@@ -1,0 +1,13 @@
+[Unit]
+Description=MongoDB API Ultra-rápida
+After=network.target
+
+[Service]
+User=jose
+WorkingDirectory=/home/jose/mongo-api
+ExecStart=/home/jose/mongo-api/venv/bin/python /home/jose/mongo-api/run.py
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target 
