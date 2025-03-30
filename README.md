@@ -178,6 +178,97 @@ curl -X 'POST' \
 }'
 ```
 
+## Casos de uso
+
+Esta API puede ser utilizada en diversos escenarios, especialmente ahora que cuenta con un sistema de seguridad robusto que permite su exposición a Internet a través de un proxy inverso como Caddy.
+
+### Aplicaciones móviles
+
+- **Alternativa potente a SQLite**: Proporciona todas las capacidades de MongoDB desde dispositivos móviles, incluyendo consultas complejas, agregaciones y búsquedas geoespaciales.
+- **Sincronización entre dispositivos**: Los usuarios pueden acceder a sus datos desde cualquier dispositivo sin necesidad de sincronizaciones manuales.
+- **Reducción de carga en dispositivos**: Las operaciones pesadas de base de datos se ejecutan en el servidor, ahorrando batería y recursos del dispositivo.
+- **Experiencia offline-first**: Implementa un sistema de sincronización donde los datos se almacenan temporalmente en el dispositivo y se sincronizan cuando hay conexión.
+
+### Servicios distribuidos en la nube
+
+- **Base de datos compartida**: Diferentes servicios ubicados en distintas regiones o proveedores pueden acceder a los mismos datos de forma segura.
+- **Arquitectura de microservicios**: Cada servicio puede tener su propio nivel de acceso a los datos según su rol.
+- **Separación de responsabilidades**: Separa la lógica de negocio del acceso a datos mediante esta API.
+
+### Otros escenarios
+
+- **CMS headless**: Base de datos para sistemas de gestión de contenido sin cabeza.
+- **Backend para IoT**: Dispositivos con recursos limitados pueden enviar y recuperar datos mediante simples peticiones HTTP.
+- **Integración con sistemas legacy**: Sistemas antiguos pueden acceder a datos en MongoDB sin necesidad de drivers específicos.
+- **Aplicaciones web de bajo código**: Interfaces JavaScript que interactúan directamente con esta API sin necesidad de backend.
+
+### Despliegue seguro con Caddy
+
+Para exponer esta API de forma segura a Internet, puedes utilizar Caddy como proxy inverso. A continuación, se muestra una configuración de ejemplo para el archivo `Caddyfile`:
+
+```
+api.tudominio.com {
+    # TLS automático con Let's Encrypt
+    tls {
+        protocols tls1.2 tls1.3
+        # Para producción, elimina esta línea:
+        ca https://acme-staging-v02.api.letsencrypt.org/directory
+    }
+
+    # Límite de tasa para prevenir abusos (10 peticiones por segundo)
+    rate_limit {
+        zone global {
+            requests 10 r/s
+        }
+    }
+
+    # Encabezados de seguridad
+    header {
+        # Prevenir ataques de clickjacking
+        X-Frame-Options "DENY"
+        # Prevenir MIME sniffing
+        X-Content-Type-Options "nosniff"
+        # Activar XSS Protection en navegadores antiguos
+        X-XSS-Protection "1; mode=block"
+        # HTTP Strict Transport Security
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # Eliminar encabezados de servidor para ocultar información
+        -Server
+    }
+
+    # Proxy inverso a nuestra API
+    reverse_proxy localhost:28000 {
+        # Timeouts más largos para peticiones que puedan tardar más
+        timeouts 2m
+        
+        # Health checks
+        health_path /api/databases
+        health_interval 30s
+    }
+
+    # Logs
+    log {
+        output file /var/log/caddy/api.tudominio.com.log
+        format console
+        level INFO
+    }
+}
+```
+
+Para implementar esta configuración:
+
+1. Instala Caddy en tu servidor
+2. Guarda la configuración anterior en un archivo `Caddyfile`
+3. Inicia Caddy con este archivo de configuración
+4. Asegúrate de que tu firewall permita tráfico en los puertos 80 y 443
+
+Esto proporcionará:
+- TLS/SSL automático con Let's Encrypt
+- Protección contra ataques mediante límites de tasa
+- Encabezados de seguridad para prevenir vulnerabilidades comunes
+- Proxy inverso a la API con monitoreo de salud
+- Registro de accesos para auditoría
+
 ## Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles. 
