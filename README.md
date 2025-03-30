@@ -86,20 +86,36 @@ Una vez autorizado, podrás probar todos los endpoints, incluyendo aquellos que 
 
 ## Autenticación y Control de Acceso
 
-La API implementa un sistema de autenticación basado en Bearer tokens y control de acceso basado en roles:
+La API implementa un sistema de autenticación basado en Bearer tokens y control de acceso basado en roles configurable:
 
-- **Rol de Lector (por defecto)**: Puede ejecutar operaciones de lectura como buscar documentos, listar colecciones, obtener estadísticas, etc.
-- **Rol de Administrador**: Puede ejecutar todas las operaciones, incluyendo escritura, modificación y eliminación.
+### Roles Disponibles
+
+- **PUBLIC**: Acceso sin autenticación para endpoints públicos
+- **READER**: Acceso básico de lectura (por defecto sin token)
+- **EDITOR**: Puede crear y modificar datos pero no eliminarlos
+- **ADMIN**: Acceso completo (con token válido)
+- **SUPERADMIN**: Acceso completo más operaciones administrativas especiales
+
+### Sistema de Permisos Configurable
+
+Todos los permisos y roles están configurados en el archivo `config/roles.yaml`. Este archivo permite:
+
+- Definir el rol mínimo requerido para cada endpoint
+- Configurar el rol predeterminado para usuarios sin token
+- Configurar el rol asignado a usuarios con token válido
+- Definir una jerarquía personalizada de roles
+
+Para modificar la configuración de permisos, edita el archivo `config/roles.yaml`. Los cambios se aplican automáticamente sin necesidad de reiniciar la API.
 
 ### Autenticación con Bearer Token
 
-Para obtener acceso de administrador, incluye el siguiente encabezado en tus peticiones:
+Para acceder con un rol privilegiado, incluye el siguiente encabezado en tus peticiones:
 
 ```
 Authorization: Bearer 9791cd25-b7e1-4059-d26b-397dee7dd442
 ```
 
-Si no se proporciona un token o es inválido, se asume el rol de lector, con acceso limitado a operaciones de sólo lectura.
+Si no se proporciona un token o es inválido, se asumirá el rol predeterminado (normalmente READER), con acceso limitado según la configuración.
 
 ## Endpoints Principales
 

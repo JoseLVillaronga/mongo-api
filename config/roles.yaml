@@ -1,0 +1,128 @@
+# Configuración de Roles y Permisos para la API de MongoDB
+#
+# Este archivo define los roles y los permisos para cada endpoint de la API.
+# 
+# Roles disponibles (orden de privilegios de menor a mayor):
+# - PUBLIC: Acceso sin autenticación
+# - READER: Acceso básico de lectura (por defecto sin token)
+# - EDITOR: Puede crear y modificar datos pero no eliminarlos
+# - ADMIN: Acceso completo (con token válido)
+# - SUPERADMIN: Acceso completo más operaciones administrativas especiales
+#
+# Cada endpoint tiene un "required_role" que define el rol mínimo necesario para acceder.
+# Si un usuario tiene un rol igual o superior al requerido, se le concederá acceso.
+
+# Configuración global
+default_role: READER  # Rol asignado si no hay token o es inválido
+admin_role: ADMIN     # Rol asignado si se proporciona un token válido
+
+# Configuración de endpoints
+endpoints:
+
+  # Operaciones con bases de datos
+  databases:
+    list:
+      method: GET
+      path: /api/databases
+      required_role: READER
+      description: Listar todas las bases de datos
+
+  # Operaciones con colecciones
+  collections:
+    list:
+      method: GET
+      path: /api/collections
+      required_role: READER
+      description: Listar colecciones en una base de datos
+    create:
+      method: POST
+      path: /api/collections
+      required_role: ADMIN
+      description: Crear una nueva colección
+    delete:
+      method: DELETE
+      path: /api/collections
+      required_role: ADMIN
+      description: Eliminar una colección
+    stats:
+      method: GET
+      path: /api/collections/stats
+      required_role: READER
+      description: Obtener estadísticas de una colección
+
+  # Operaciones con documentos
+  documents:
+    insert:
+      method: POST
+      path: /api/documents
+      required_role: ADMIN
+      description: Insertar un documento
+    get_by_id:
+      method: GET
+      path: /api/documents/{id}
+      required_role: READER
+      description: Obtener un documento por ID
+    update:
+      method: PUT
+      path: /api/documents/{id}
+      required_role: ADMIN
+      description: Actualizar un documento por ID
+    delete:
+      method: DELETE
+      path: /api/documents/{id}
+      required_role: ADMIN
+      description: Eliminar un documento por ID
+    find:
+      method: POST
+      path: /api/documents/find
+      required_role: READER
+      description: Buscar documentos con filtros
+    count:
+      method: POST
+      path: /api/documents/count
+      required_role: READER
+      description: Contar documentos
+
+  # Operaciones de agregación
+  aggregation:
+    aggregate:
+      method: POST
+      path: /api/aggregate
+      required_role: READER
+      description: Ejecutar pipeline de agregación
+    distinct:
+      method: POST
+      path: /api/distinct
+      required_role: READER
+      description: Obtener valores distintos
+    bulk:
+      method: POST
+      path: /api/bulk
+      required_role: ADMIN
+      description: Realizar operaciones en lote
+
+  # Operaciones con índices
+  indexes:
+    list:
+      method: GET
+      path: /api/indexes
+      required_role: READER
+      description: Listar índices
+    create:
+      method: POST
+      path: /api/indexes
+      required_role: ADMIN
+      description: Crear un índice
+    delete:
+      method: DELETE
+      path: /api/indexes/{index_name}
+      required_role: ADMIN
+      description: Eliminar un índice
+
+# Configuración avanzada
+roles_hierarchy:
+  PUBLIC: 0
+  READER: 10
+  EDITOR: 20
+  ADMIN: 30
+  SUPERADMIN: 40 
