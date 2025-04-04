@@ -1,4 +1,5 @@
 # API Ultra-rápida para MongoDB
+![api-ultra-rapida-mongo](https://github.com/user-attachments/assets/880b340c-7ad1-4aa0-a80f-5210a8daa346)
 
 Esta API proporciona acceso completo a las funcionalidades nativas de MongoDB a través de una interfaz REST. Permite realizar todas las operaciones CRUD, así como operaciones avanzadas como agregaciones, índices y más.
 
